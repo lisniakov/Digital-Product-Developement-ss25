@@ -1,6 +1,6 @@
 // src/screens/ProfileScreen.js
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,44 @@ import {
   StatusBar
 } from 'react-native';
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreen = ({ navigation, route }) => {
+  // Default profile data
+  const defaultProfile = {
+    name: 'Jane Doe',
+    phone: '030 8675432',
+    email: 'Janedoe@example.com',
+    avatar: 'https://placekitten.com/300/300',
+    dateOfBirth: ''
+  };
+
+  // Initialize with either passed profile or default
+  const [profile, setProfile] = useState(route.params?.profile || defaultProfile);
+
+  // Update profile when coming back from edit screen or when receiving new profile data
+  useEffect(() => {
+    if (route.params?.updatedProfile) {
+      setProfile(route.params.updatedProfile);
+      // Clear the params to prevent re-updating on subsequent renders
+      navigation.setParams({ updatedProfile: null });
+    } else if (route.params?.profile && route.params.profile !== profile) {
+      // Update if we received new profile data from HomeScreen
+      setProfile(route.params.profile);
+    }
+  }, [route.params?.updatedProfile, route.params?.profile]);
+
+  const handleEditProfile = () => {
+    navigation.navigate('ProfileEdit', { profile });
+  };
+
+  const handleBackButton = () => {
+    // Pass the current profile back to Home when going back
+    navigation.navigate('Home', { updatedProfile: profile });
+  };
+
+  const handleSettingsNavigation = () => {
+    navigation.navigate('Settings');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#2260FF" />
@@ -20,7 +57,7 @@ const ProfileScreen = ({ navigation }) => {
       <View style={styles.headerContainer}>
         <TouchableOpacity 
           style={styles.backButton}
-          onPress={() => navigation.goBack()}
+          onPress={handleBackButton}
         >
           <Text style={styles.backButtonText}>{'<'}</Text>
         </TouchableOpacity>
@@ -30,29 +67,38 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.profileSection}>
           <View style={styles.profileImageContainer}>
             <Image
-              source={{ uri: 'https://placekitten.com/300/300' }} // Replace with actual user image
+              source={{ uri: profile.avatar }}
               style={styles.profileImage}
             />
-            <TouchableOpacity style={styles.editImageButton}>
+            <TouchableOpacity 
+              style={styles.editImageButton}
+              onPress={handleEditProfile}
+            >
               <Text style={styles.editImageIcon}>✏️</Text>
             </TouchableOpacity>
           </View>
           
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>Jane Doe</Text>
-            <Text style={styles.profilePhone}>030 8675432</Text>
-            <Text style={styles.profileEmail}>Janedoe@example.com</Text>
+            <Text style={styles.profileName}>{profile.name}</Text>
+            <Text style={styles.profilePhone}>{profile.phone}</Text>
+            <Text style={styles.profileEmail}>{profile.email}</Text>
+            {profile.dateOfBirth && (
+              <Text style={styles.profileBirthDate}>Born: {profile.dateOfBirth}</Text>
+            )}
           </View>
         </View>
       </View>
       
       {/* Settings Options */}
       <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity 
+          style={styles.settingItem}
+          onPress={handleEditProfile}
+        >
           <View style={styles.iconCircle}>
             <Text style={styles.iconText}>👤</Text>
           </View>
-          <Text style={styles.settingText}>Profile</Text>
+          <Text style={styles.settingText}>Edit Profile</Text>
           <Text style={styles.chevron}>›</Text>
         </TouchableOpacity>
         
@@ -72,7 +118,10 @@ const ProfileScreen = ({ navigation }) => {
           <Text style={styles.chevron}>›</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity 
+          style={styles.settingItem}
+          onPress={handleSettingsNavigation}
+        >
           <View style={styles.iconCircle}>
             <Text style={styles.iconText}>⚙️</Text>
           </View>
@@ -183,6 +232,12 @@ const styles = StyleSheet.create({
   profileEmail: {
     color: '#FFFFFF',
     fontSize: 18,
+    marginBottom: 3,
+  },
+  profileBirthDate: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    opacity: 0.9,
   },
   settingsContainer: {
     flex: 1,
@@ -192,30 +247,30 @@ const styles = StyleSheet.create({
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
   iconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#2689F2',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
   },
   iconText: {
-    fontSize: 24,
+    fontSize: 20,
   },
   settingText: {
     flex: 1,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '500',
     color: '#000000',
   },
   chevron: {
-    fontSize: 24,
+    fontSize: 20,
     color: '#33E4DB',
     fontWeight: 'bold',
   },

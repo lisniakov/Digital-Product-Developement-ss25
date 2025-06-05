@@ -14,11 +14,20 @@ import {
 } from 'react-native';
 import { fetchAllResidents } from '../services/api';
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, route }) => {
   const [residents, setResidents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedResident, setSelectedResident] = useState(null);
+  
+  // Profile state with default values
+  const [userProfile, setUserProfile] = useState({
+    name: 'Jane Doe',
+    phone: '030 8675432',
+    email: 'janedoe@korian.com',
+    avatar: 'https://placekitten.com/60/60',
+    dateOfBirth: ''
+  });
 
   useEffect(() => {
     const loadResidents = async () => {
@@ -33,6 +42,15 @@ const HomeScreen = ({ navigation }) => {
     };
     loadResidents();
   }, []);
+
+  // Update profile when returning from Profile screen
+  useEffect(() => {
+    if (route.params?.updatedProfile) {
+      setUserProfile(route.params.updatedProfile);
+      // Clear the params to prevent re-updating on subsequent renders
+      navigation.setParams({ updatedProfile: null });
+    }
+  }, [route.params?.updatedProfile]);
 
   // Filter residents by name
   const filteredResidents = residents.filter(item => {
@@ -59,6 +77,14 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
+  const handleProfileNavigation = () => {
+    navigation.navigate('Profile', { profile: userProfile });
+  };
+
+  const handleSettingsNavigation = () => {
+    navigation.navigate('Settings');
+  };
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -77,7 +103,10 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity style={styles.iconCircle}>
             <Text style={styles.iconText}>🔔</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconCircle}>
+          <TouchableOpacity 
+            style={styles.iconCircle}
+            onPress={handleSettingsNavigation}
+          >
             <Text style={styles.iconText}>⚙️</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconCircle}>
@@ -88,19 +117,19 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.userProfileContainer}>
           <View style={{ alignItems: 'flex-end' }}>
             <Text style={styles.welcomeText}>Hi, WelcomeBack</Text>
-            <Text style={styles.userName}>Jane Doe</Text>
+            <Text style={styles.userName}>{userProfile.name}</Text>
           </View>
           <View style={styles.userProfileContainer}>
-              <TouchableOpacity 
+            <TouchableOpacity 
               style={styles.profileImageWrapper}
-              onPress={() => navigation.navigate('Profile')}
-              >
-                <Image
-                source={{ uri: 'https://placekitten.com/60/60' }}
+              onPress={handleProfileNavigation}
+            >
+              <Image
+                source={{ uri: userProfile.avatar }}
                 style={styles.profileImage}
-                />
-                </TouchableOpacity>
-              </View>
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -128,7 +157,6 @@ const HomeScreen = ({ navigation }) => {
             Alert.alert('Info', 'Feature coming soon.');
           }}
         >
-
           <Text style={styles.actionIcon}>🏃‍♂️</Text>
           <Text style={styles.actionLabel}>Fall History</Text>
         </TouchableOpacity>
@@ -161,8 +189,6 @@ const HomeScreen = ({ navigation }) => {
         style={styles.residentsList}
       />
 
-      
-
       {/* Bottom Nav Bar */}
       <View style={styles.bottomNav}>
         <TouchableOpacity 
@@ -177,12 +203,12 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.navLabel}>Messages</Text>
         </TouchableOpacity>
         <TouchableOpacity
-        style={styles.navItem}
-        onPress={() => navigation.navigate('Profile')}
+          style={styles.navItem}
+          onPress={handleProfileNavigation}
         >
           <Text style={styles.navIcon}>👤</Text>
           <Text style={styles.navLabel}>Profile</Text>
-          </TouchableOpacity>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
           <Text style={styles.navIcon}>📅</Text>
           <Text style={styles.navLabel}>Booking</Text>
