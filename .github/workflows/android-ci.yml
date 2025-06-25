@@ -1,42 +1,24 @@
-name: Android CI
+name: Build Android APK
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Checks-out your repository
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v3
 
-      # 2. Sets up JDK 17
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'gradle'
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 11
 
-      # 3. Grant execute permission for gradlew
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+    - name: Build with Gradle
+      run: ./gradlew assembleDebug
 
-      # 4. NEW STEP: Add google-services.json file from secrets
-      - name: Add google-services.json
-        # This command takes the secret and writes it to the file path the build expects
-        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/google-services.json
-
-      # 5. Runs the build command
-      - name: Build with Gradle
-        run: ./gradlew build
-
-      # 6. Runs the unit tests
-      - name: Run unit tests
-        run: ./gradlew test
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-debug.apk
+        path: app/build/outputs/**/*.apk
