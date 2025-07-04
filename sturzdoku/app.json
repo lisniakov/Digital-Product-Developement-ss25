@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "sturzdoku",
+    "slug": "sturzdoku",
+    "version": "1.0.0",
+    "jsEngine": "jsc",
+
+    "android": {
+      "networkSecurityConfig": "./network_security_config.xml"
+    }
+  }
+}
