@@ -89,7 +89,6 @@ const FallIncidentReportScreen = ({ route, navigation }) => {
         narrative: reportText
       });
       Alert.alert('Success', 'Report saved!');
-      navigation.goBack();
     } catch (err) {
       console.error(err);
       Alert.alert('Error', 'Could not save report.');
@@ -106,7 +105,7 @@ const FallIncidentReportScreen = ({ route, navigation }) => {
       setExporting(true);
       console.log('PDF export started with BASE_URL:', BASE_URL);
 
-      // Generate PDF on backend
+      // Generate PDF on backend with enhanced data
       const response = await fetch(`${BASE_URL}/api/report/pdf`, {
         method: 'POST',
         headers: {
@@ -115,6 +114,14 @@ const FallIncidentReportScreen = ({ route, navigation }) => {
         body: JSON.stringify({
           residentId: resident.id,
           reportText: reportText,
+          // Pass additional data for enhanced PDF
+          resident: resident,
+          placeOfFall: placeOfFall,
+          condition: condition,
+          vitals: vitals,
+          aidsPresent: aidsPresent,
+          injuries: injuries,
+          firstAid: firstAid
         }),
       });
 
