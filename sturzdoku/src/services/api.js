@@ -36,6 +36,9 @@ const HOST = detectHost();
 const BASE_URL = `http://${HOST}:4000`;
 console.log('[API] baseURL =', BASE_URL);
 
+// Export BASE_URL for use in other components
+export { BASE_URL };
+
 /*──────────────── axios instance ────────────────*/
 export const API = axios.create({
   baseURL: BASE_URL,

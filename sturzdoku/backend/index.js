@@ -3,7 +3,14 @@ import cors             from 'cors';
 import dotenv           from 'dotenv';
 import bcrypt           from 'bcrypt';
 import jwt              from 'jsonwebtoken';
+import path             from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import { PrismaClient } from '@prisma/client';
+import pdfRoutes        from './routes/generatePdf.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 dotenv.config();
 const prisma      = new PrismaClient();
@@ -215,6 +222,13 @@ app.put('/me/password', authenticate, async (req, res) => {
     res.status(500).send('DB error');
   }
 });
+
+/* -------- PDF ROUTES ------------------------------ */
+app.use('/api/report', pdfRoutes);
+
+/* -------- STATIC FILE SERVING ------------------------------ */
+// Fix: Serve static files from backend/public directory
+app.use('/reports', express.static(path.join(__dirname, 'public/reports')));
 
 /*─────────────────────────────────────────────────────────*/
 const PORT = 4000;
