@@ -19,6 +19,13 @@ router.post('/pdf', async (req, res) => {
   }
 
   try {
+    // Debug logging
+    console.log('PDF Generation Debug:');
+    console.log('residentId:', residentId);
+    console.log('resident object:', resident);
+    console.log('resident?.name:', resident?.name);
+    console.log('resident?.id:', resident?.id);
+
     const filename = `fall_report_${residentId}_${Date.now()}.pdf`;
     
     // Create reports directory in backend/public/reports
@@ -124,7 +131,14 @@ router.post('/pdf', async (req, res) => {
     let rightY = currentY;
     rightY = addFormField('Report Date:', new Date().toLocaleDateString(), rightColumnX, rightY, rightColumnWidth, 18);
     rightY = addFormField('Staff Notified:', 'Nursing Staff', rightColumnX, rightY, rightColumnWidth, 18);
-    rightY = addFormField('Resident Name/ID:', resident?.name || `ID: ${residentId}`, rightColumnX, rightY, rightColumnWidth, 18);
+    let displayName = '';
+    if (resident?.name && resident.name.trim()) {
+        displayName = `${resident.name} (ID: ${residentId})`;
+    } else {
+        displayName = `ID: ${residentId}`;
+    }
+
+    rightY = addFormField('Resident Name/ID:', displayName, rightColumnX, rightY, rightColumnWidth, 18);
 
     // Use the maximum Y position from both columns
     currentY = Math.max(leftY, rightY) + 10;

@@ -133,7 +133,10 @@ const AidsPresentScreen = ({ route, navigation }) => {
       <View style={styles.bottomNav}>
         <TouchableOpacity 
         style={styles.navItem} 
-        onPress={() => navigation.navigate('Home')}
+        onPress={() => navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        })}
         >
         <Text style={styles.navIcon}>🏠</Text>
         <Text style={styles.navLabel}>Home</Text>

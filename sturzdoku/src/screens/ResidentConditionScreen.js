@@ -107,7 +107,13 @@ const ResidentConditionScreen = ({ route, navigation }) => {
 
       {/* Fixed Bottom Nav */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity 
+        style={styles.navItem} 
+        onPress={() => navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        })}
+        >
           <Text style={styles.navIcon}>🏠</Text>
           <Text style={styles.navLabel}>Home</Text>
         </TouchableOpacity>

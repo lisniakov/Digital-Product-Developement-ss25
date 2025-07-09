@@ -89,6 +89,7 @@ const FallIncidentReportScreen = ({ route, navigation }) => {
         narrative: reportText
       });
       Alert.alert('Success', 'Report saved!');
+      navigation.goBack();
     } catch (err) {
       console.error(err);
       Alert.alert('Error', 'Could not save report.');
